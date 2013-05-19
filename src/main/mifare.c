@@ -20,7 +20,7 @@ int testMain(void) {
 	for (;;) {
 		cls();
 		putstr("MIFARE  test");
-		rt = testrc531();
+		//rt = testrc531();
 		kt = 1000000;
 		while (kt--);
 		if (rt == 1) {
@@ -31,6 +31,7 @@ int testMain(void) {
 			}
 		}
 	}
+
 	return 0;
 }
 
@@ -41,6 +42,7 @@ char payment(float money) {
 			0xff };
 
 	cls();
+
 	putstr("MIFARE ≤‚ ‘");
 	putstr("\n CLS exit");
 
@@ -50,6 +52,7 @@ char payment(float money) {
 		state = mif_request(0, cardType);
 		if (state != MI_OK) {
 			putstr("\n request error ");
+
 			putchhex(state);
 			return PaymentFailed;
 		}

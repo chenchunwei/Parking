@@ -3,7 +3,6 @@
  */
 
 #include<hspos.h>
-#include<gprs_api.h>
 
 typedef unsigned char Uchar8; /*  8bit	*/
 typedef unsigned short Uint16; /* 16bit	*/
@@ -381,8 +380,11 @@ int main(void) {
 
 	Uchar8 ndata[40], pdata[40];
 	Uchar8 ss;
-	putstr("①来一段提示\n");
-	key(0);
+	putstr("①请输入要测试的slot\n");
+
+	unsigned char slot= key(0);
+	CPUCardTEest(slot);
+
 	unsigned short rlen;
 
 	AllUPSW_Read(&(G_USERINFO));
@@ -512,7 +514,7 @@ int main(void) {
 		}
 		libopen(DBFNO_BOWEI);
 		libset(6, 6);
-		libread(lshdata);
+		libread((char*) lshdata);
 		for (r = 0; r < libsumf(); r++) //查找所有的用户名，找出与他相匹配的
 				{
 			memset(tdata, 0x00, sizeof (tdata));
@@ -5908,8 +5910,10 @@ int ReSend(void) {
 						memcpy(kdata, "2", 1); //进门失败 1进门成功    3成功
 						libset(r, SCCG); //出门标志  0说明发送失败
 						libwrite(kdata);
+
 					}
 				}
+
 			}
 			WNetIPClose("1", 4000);
 		}
