@@ -1,31 +1,31 @@
 #include <hspos.h>
 /*int main(void)
-{
-    unsigned char  k;
-    ICC_IFOpen(0);
-    while(1)
-    {
-    	cls();
-    	putstr("\n ic card test");
-    	putstr("\n1.CPU TEST ");
-    	putstr("\n2.SAM TEST");
-        putstr("\n[CLS].Exit");
-        k=key(0);
-        if(k=='1')
-        {
-            CPUCardTEest(1);
-        }
-        else if(k=='2')
-        {
-            CPUCardTEest(2);
-        }
-        else if(k==KEY_CLS)
-        {
-            return 1;
-        }
-    }
-    k=key(0);
-}*/
+ {
+ unsigned char  k;
+ ICC_IFOpen(0);
+ while(1)
+ {
+ cls();
+ putstr("\n ic card test");
+ putstr("\n1.CPU TEST ");
+ putstr("\n2.SAM TEST");
+ putstr("\n[CLS].Exit");
+ k=key(0);
+ if(k=='1')
+ {
+ CPUCardTEest(1);
+ }
+ else if(k=='2')
+ {
+ CPUCardTEest(2);
+ }
+ else if(k==KEY_CLS)
+ {
+ return 1;
+ }
+ }
+ k=key(0);
+ }*/
 void CPUCardTEest( slot) {
 
 	unsigned char rbuf[10], k, i, rlen;
@@ -34,8 +34,12 @@ void CPUCardTEest( slot) {
 
 	//取随机数
 	unsigned char PSAM_cmd_rand[5] = { 0x00, 0x84, 0x00, 0x00, 0x08 };
-	//unsigned char PSAM_cmd_file[] = { 0x00, 0xa4, 0x00, 0x00, 0x02, 0x3f, 0x00 };
-	unsigned char PSAM_cmd_file[] = { 0x00, 0xa4, 0x00, 0x00, 0x02, 0x00, 0x00 };
+	//unsigned char PSAM_cmd_file[] = { 0x00, 0xa4, 0x00, 0x00, 0x02, 0x3f, 0x00 };选择公共钱包:00 A4 04 00 09 A0 00 00 00 03 86 98 07 01
+	//unsigned char PSAM_cmd_file[] = { 0x00, 0xa4, 0x00, 0x00, 0x02, 0x00, 0x00 };
+	unsigned char PSAM_cmd_file[] = { 0x00, 0xA4, 0x04, 0x00, 0x09, 0xA0, 0x00,
+			0x00, 0x00, 0x03, 0x86, 0x98, 0x07, 0x01 };
+	printf("\nPSAM_cmd_file=%02x", PSAM_cmd_file);
+	key(0);
 	unsigned char rt;
 	while (1) {
 		cls();
@@ -89,7 +93,7 @@ void CPUCardTEest( slot) {
 #endif
 
 			printf("\n select file ");
-			rv = ICC_IsoCommand(slot, 7, PSAM_cmd_file, &rlen, rbuf3);
+			rv = ICC_IsoCommand(slot, 14, PSAM_cmd_file, &rlen, rbuf3);
 			if (rv == 0x9000) {
 				printf("\n");
 				for (i = 0; i < rlen; i++) {
