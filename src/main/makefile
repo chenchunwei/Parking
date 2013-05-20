@@ -6,8 +6,8 @@ CC   = arm-elf-gcc.exe
 AR  = arm-elf-ar.exe
 LD   = arm-elf-ld.exe
 OBJCOPY   = arm-elf-objcopy.exe
-OBJ  = gprs.o main.o card.o
-LINKOBJ  = gprs.o  main.o card.o
+OBJ  = utility.o gprs.o card.o main.o
+LINKOBJ  = utility.o gprs.o card.o main.o
 LIBS =   
 INCS = 
 CXXINCS = 
@@ -25,6 +25,9 @@ all: $(Cof)
 card.o: card.c
 	$(CC) $(CFLAGS) -c card.c -o card.o
 	
+utility.o: utility.c
+	$(CC) $(CFLAGS) -c utility.c -o utility.o
+		
 gprs.o: gprs.c
 	$(CC) $(CFLAGS) -c gprs.c -o gprs.o
 	

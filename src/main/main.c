@@ -1,7 +1,3 @@
-/*
- **	编译环境：  WinIDE
- */
-
 #include<hspos.h>
 
 typedef unsigned char Uchar8; /*  8bit	*/
@@ -295,7 +291,7 @@ unsigned long get_days(int year, int month, int date);
 int IN_put_CHE_PAI(Uchar8 *s);
 Uchar8 JMPD_DB(TYPE_PARKINFO *ParkInfo);
 Uchar8 JMPD_Flag(TYPE_PARKINFO *ParkInfo);
-Uchar8 ksh(Uchar8 *cdata, Uchar8 n1, Uchar8 n2, Uchar8 reg);
+Uchar8 ReadLine(Uchar8 *cdata, Uchar8 n1, Uchar8 n2, Uchar8 reg);
 U8 Key_PSW(U8 *kdata, U8 lgh);
 Uchar8 LeapYear(Sint16 year);
 Uint16 length(Uchar8 *s);
@@ -368,11 +364,11 @@ U8 BoWei_XuanZe(U8 *bw);
 U8 BoWei_ChaXun(U8 *bw);
 void CheWei_ChaXun1(void);
 void alert(Uchar8 *message);
-//工具方法
-int isEmpty(char *s);
 
 //主函数
 int main(void) {
+	TestCpuCmd();
+	TestReadLine();
 	putstr("这中在eslipse上编译的代码on win8");
 	key(0);
 	Uchar8 k, kr, lgh, r;
@@ -382,8 +378,12 @@ int main(void) {
 	Uchar8 ss;
 	putstr("①请输入要测试的slot\n");
 
-	unsigned char slot= key(0);
-	CPUCardTEest(slot);
+	unsigned char slot = key(1);
+	if (slot == '1') {
+		CPUCardTEest(1);
+	} else {
+		CPUCardTEest(2);
+	}
 
 	unsigned short rlen;
 
@@ -494,7 +494,7 @@ int main(void) {
 		bell(20);
 		putstr("登陆名:");
 		memset(ndata, 0x00, sizeof (ndata));
-		lgh = ksh(ndata, 0, 3, 1);
+		lgh = ReadLine(ndata, 0, 3, 1);
 		if (lgh == 0) {
 			if (ndata[1] == KEY_F2)
 				return 0;
@@ -542,8 +542,7 @@ int main(void) {
 			break;
 		}
 	}
-	P_U8 menu[] = { "[1] 车辆进门", "[2] 车辆出门", "[3] 泊位查询", "[4] 收费查询", "[5] 补单管理",
-			"[6] 逃单管理", "[7] 系统设置" };
+	P_U8 menu[] = { "[1] 车辆进门", "[2] 车辆出门", "[3] 泊位查询", "[4] 收费查询", "[5] 补单管理", "[6] 逃单管理", "[7] 系统设置" };
 	if (kr == 1) {
 		GPRS_Link_init();
 		//GPRS_SET1();
@@ -567,8 +566,7 @@ int main(void) {
 
 	AllUPSW_Read(&(G_USERINFO));
 	for (k = 0; k < USERPSW_W; k++) {
-		if ((G_USERINFO.UserPSW[U_GLY][k] < 0x30)
-				| (G_USERINFO.UserPSW[U_GLY][k] > 0x39)) {
+		if ((G_USERINFO.UserPSW[U_GLY][k] < 0x30) | (G_USERINFO.UserPSW[U_GLY][k] > 0x39)) {
 			PRate_Set();
 			User_Format();
 			break;
@@ -730,20 +728,10 @@ U8 BoWei_XuanZe(U8 *bw) {
 	U8 k, s;
 	U8 mtotal;
 
-	P_U8 menu[30] = { "1                   ", "2                   ",
-			"3                   ", "4                   ",
-			"5                   ", "6                   ",
-			"7                   ", "8                   ",
-			"9                   ", "10                  ",
-			"11                  ", "12                  ",
-			"13                  ", "14                  ",
-			"15                  ", "16                  ",
-			"17                  ", "18                  ",
-			"19                  ", "20                  ",
-			"21                  ", "22                  ",
-			"23                  ", "24                  ",
-			"25                  ", "26                  ",
-			"27                  ", "28                  ",
+	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
+			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
+			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", "21                  ",
+			"22                  ", "23                  ", "24                  ", "25                  ", "26                  ", "27                  ", "28                  ",
 			"29                  ", "30                  ", };
 	mtotal = (sizeof (menu)) / sizeof(menu[0]);
 	cls();
@@ -803,7 +791,7 @@ U8 BoWei_XuanZe(U8 *bw) {
 		putstr_x("请输入:", 1);
 		memset(kdata, 0x00, sizeof (kdata));
 		kdata[0] = kr;
-		lgh = ksh(kdata, 1, BOWEI_W, 0);
+		lgh = ReadLine(kdata, 1, BOWEI_W, 0);
 		if (lgh == 0) {
 			return 0;
 		} else {
@@ -847,20 +835,10 @@ U8 BoWei_ChaXun(U8 *bw) {
 	memset((Uchar8 *) (&ParkInfo), 0x00, sizeof (ParkInfo));
 	Uint16 index[20];   //  查询到的记录数
 	U8 mtotal;
-	P_U8 menu[30] = { "1                   ", "2                   ",
-			"3                   ", "4                   ",
-			"5                   ", "6                   ",
-			"7                   ", "8                   ",
-			"9                   ", "10                  ",
-			"11                  ", "12                  ",
-			"13                  ", "14                  ",
-			"15                  ", "16                  ",
-			"17                  ", "18                  ",
-			"19                  ", "20                  ",
-			"21                  ", "22                  ",
-			"23                  ", "24                  ",
-			"25                  ", "26                  ",
-			"27                  ", "28                  ",
+	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
+			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
+			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", "21                  ",
+			"22                  ", "23                  ", "24                  ", "25                  ", "26                  ", "27                  ", "28                  ",
 			"29                  ", "30                  ", };
 	mtotal = (sizeof (menu)) / sizeof(menu[0]);
 
@@ -980,8 +958,7 @@ void JIAOYANGTIME(Uchar8 *udata) {
 	int int_result4 = 0;
 	int_result4 = stoi(2, &(udata[12]));
 
-	if (int_result5 != int_result6 || int_result > 12 || int_result1 > 32
-			|| int_result2 > 24 || int_result3 > 60 || int_result4 > 60) {
+	if (int_result5 != int_result6 || int_result > 12 || int_result1 > 32 || int_result2 > 24 || int_result3 > 60 || int_result4 > 60) {
 		// memset( PUBLIC_BOOLEN, 0x00, sizeof(PUBLIC_BOOLEN) );
 		//memcpy( PUBLIC_BOOLEN,"123456", 6);
 		PUBLIC_BOOLEN = 1;
@@ -1076,7 +1053,7 @@ void Door_In_2(void) {
 		putstr("请输入泊位号");
 
 		memset(bwhdata, 0x00, sizeof (bwhdata));
-		lgh = ksh(bwhdata, 0, 4, 1);
+		lgh = ReadLine(bwhdata, 0, 4, 1);
 
 		if (lgh == 0) {
 			if (bwhdata[1] == KEY_F2) {
@@ -1275,7 +1252,7 @@ void Door_Out_2(void) {
 		moveto(1, 1);
 		memset(kdata, 0x00, sizeof (kdata));
 		putstr("请输入泊位号:");
-		lgh = ksh(kdata, 0, 4, 1);
+		lgh = ReadLine(kdata, 0, 4, 1);
 		if (lgh == 0) {
 			if (kdata[1] == KEY_F2) {
 				return;
@@ -1629,12 +1606,12 @@ Uchar8 JMPD_DB(TYPE_PARKINFO *ParkInfo) {
 		memset(kdata, 0x00, sizeof (kdata));
 		libset(r, CHEPAI);
 		libread(kdata);
-		if (memcmp(ParkInfo->chepai, kdata, strlen(ParkInfo->chepai)) == 0)//	数据库读取后会有填充的空格，如果欲取kdata长度必须用length
+		if (memcmp(ParkInfo->chepai, kdata, strlen(ParkInfo->chepai)) == 0)									//	数据库读取后会有填充的空格，如果欲取kdata长度必须用length
 				{
 					memset(kdata, 0x00, sizeof(kdata));
 					libset(r, LKSJ);
 					libread(kdata);
-					if ((kdata[0] < 0x30) | (kdata[0] > 0x39))//	未出门
+					if ((kdata[0] < 0x30) | (kdata[0] > 0x39))									//	未出门
 					{
 						{
 							ParkInfo->r = r;			//	break后到达此处，进门记录返回
@@ -2202,7 +2179,7 @@ int PInfo_Calc(TYPE_PARKINFO *ParkInfo) {
 	memcpy(ts.end, (ParkInfo->time_out), 14);
 	TimeSpan_Calc(&ts);												//	时间差计算
 	memset(ParkInfo->time_disp, 0x00, sizeof (ParkInfo->time_disp));
-	memcpy(ParkInfo->time_disp, ts.time_disp, strlen(ts.time_disp));//	返回时间差的可读文字
+	memcpy(ParkInfo->time_disp, ts.time_disp, strlen(ts.time_disp));												//	返回时间差的可读文字
 
 	//	【计费】
 	PRate_Read(ParkInfo);
@@ -2555,9 +2532,7 @@ void TimeSpan_Calc(TYPE_TIMESPAN *ts) {
 
 #if( 1 )
 	{
-		if ((((ts->begin[4]) < 0x30) | ((ts->begin[4]) > 0x39))
-				| (((ts->begin[7]) < 0x30) | ((ts->begin[7]) > 0x39))
-				| (((ts->end[4]) < 0x30) | ((ts->end[4]) > 0x39))
+		if ((((ts->begin[4]) < 0x30) | ((ts->begin[4]) > 0x39)) | (((ts->begin[7]) < 0x30) | ((ts->begin[7]) > 0x39)) | (((ts->end[4]) < 0x30) | ((ts->end[4]) > 0x39))
 				| (((ts->end[7]) < 0x30) | ((ts->end[7]) > 0x39))) {
 			//ErrorMsg( "TIMESPAN入口参数格式错误" );
 			//key(0);
@@ -2572,8 +2547,7 @@ void TimeSpan_Calc(TYPE_TIMESPAN *ts) {
 	}
 #endif
 
-	total_gap_day = get_days(int_e_year, int_e_month, int_e_day)
-			- get_days(int_b_year, int_b_month, int_b_day);	//	占位天数
+	total_gap_day = get_days(int_e_year, int_e_month, int_e_day) - get_days(int_b_year, int_b_month, int_b_day);	//	占位天数
 
 	sumr = s_end - s_begin;
 	if (sumr < 0) {
@@ -2781,8 +2755,7 @@ void PRate_Set(void) {
 
 		do {
 			k = key(0); /* 等待输入一个字符,不回显 */
-		} while (k != 0x31 && k != 0x32 && k != 0x33 && k != 0x34 && k != 0x35
-				&& k != 0x36 && k != 0x89 && k != KEY_ENTER);
+		} while (k != 0x31 && k != 0x32 && k != 0x33 && k != 0x34 && k != 0x35 && k != 0x36 && k != 0x89 && k != KEY_ENTER);
 		if (k == KEY_F2)
 			return;
 		if (k == KEY_ENTER) //  保存数值
@@ -2855,7 +2828,7 @@ void PRate_Set(void) {
 			moveto(3, 1);
 			putstr_h("请输入:");
 			memset(sdata, 0x00, sizeof (sdata));
-			lgh = ksh(sdata, 0, 4, 1);
+			lgh = ReadLine(sdata, 0, 4, 1);
 
 			if (lgh == 0)
 				continue;
@@ -2907,7 +2880,7 @@ void POSID_Set(void) {
 			moveto(9, 1);
 			putstr("新POSID:");
 			memset(sdata, 0x00, sizeof (sdata));
-			lgh = ksh(sdata, 0, POSID_W, 0);
+			lgh = ReadLine(sdata, 0, POSID_W, 0);
 			if (lgh == 0) {
 				continue;
 			} else {
@@ -3177,84 +3150,6 @@ unsigned long get_days(int year, int month, int date) {
 	}
 	days += date;
 	return days;
-}
-
-/* 从键盘接收一串全高数字字符,带回显,存放在cdata */
-/* 入口: n1为欲显示的原cdata中数据的长度,n2为最多允许接收的数据长度,reg为0时只可接收数字,为1时可接收字母,运算符等 */
-/* 出口: 返回接收字符串的长度,字符串为空时返回0(若按下数值键后再按功能键,则把功能键值存放在cdata[2],若首先就按下功能键,则把该键值存放在cdata[1] */
-Uchar8 ksh(Uchar8 *cdata, Uchar8 n1, Uchar8 n2, Uchar8 reg) {
-	Uchar8 x1, x2, y1, y2, k, i1, i2, f, end = 0;
-	i1 = n1;
-	x1 = getx();
-	y1 = gety();
-	if (n1 != 0)
-		putn_h(n1, cdata);
-	do {
-		if (i1 != n2) {
-			putch_h('_');
-			x2 = getx();
-			y2 = gety() - 1;
-		} else {
-			x2 = getx();
-			y2 = gety();
-		}
-		moveto(x2, y2);
-		ksh_1: k = key(0);
-		if (reg == 0) {
-			if ((i1 == n2) && (k >= 0x30) && (k <= 0x39))
-				goto ksh_1;
-			if ((k < 0x30 || k > 0x39) && k != 0x82)
-				end = 1;
-		}
-		if (reg == 1) {
-			if (k == 0x80)
-				goto ksh_1;
-			if (i1 == n2
-					&& !(k == 0x8d || k == 0x87 || k == 0x88 || k == 0x89
-							|| k == 0x8e || k == 0x8f || k == 0x82))
-				goto ksh_1;
-			if (k == 0x8d || k == 0x87 || k == 0x88 || k == 0x89 || k == 0x8e
-					|| k == 0x8f)
-				end = 1;
-		}
-		cdata[i1] = k;
-		if (end) {
-			f = 0;
-			if (i1 == 0) {
-				cdata[0] = 0;
-				cdata[1] = k;
-				moveto(x1, y1);
-				putch_h(' ');
-				moveto(x1, y1);
-			} else {
-				if (k == KEY_ENTER) {
-					cdata[i1] = 0;
-					if (i1 != n2)
-						putch_h(' ');
-					f = i1;
-				} else {
-					cdata[0] = 0;
-					cdata[1] = 0;
-					cdata[2] = k;
-					moveto(x1, y1);
-					for (i2 = 0; i2 <= y2 - y1; i2++)
-						putch_h(' ');
-				}
-			}
-			return (f);
-		}
-		if (k == KEY_CLS) {
-			if (i1 != 0) {
-				putch_h(' ');
-				i1 = i1 - 1;
-				y2 = y2 - 1;
-				moveto(x2, y2);
-			}
-		} else {
-			putch_h(cdata[i1]);
-			i1++;
-		}
-	} while (1);
 }
 
 /*
@@ -3608,8 +3503,7 @@ void Print_Bill(TYPE_PARKINFO *ParkInfo) {
 		//		Printer_Str( "元" );
 		//Printer_Font(0);
 
-		Printer_Str(
-				"\n免责申明：本泊位收费依据为盐政发[2012]72号、盐价[2012]25号，属于公益性停车泊位,按管理成本收取停车泊位费，不承担被盗、被损毁等所致法律责任。");
+		Printer_Str("\n免责申明：本泊位收费依据为盐政发[2012]72号、盐价[2012]25号，属于公益性停车泊位,按管理成本收取停车泊位费，不承担被盗、被损毁等所致法律责任。");
 	}
 	if (Printer_Buffer(500)) {
 		cls();
@@ -3731,8 +3625,7 @@ void Sys_Set(void) {
 
 		do {
 			k = key(0);
-		} while (k != 0x31 && k != 0x32 && k != 0x33 && k != 0x34 && k != 0x35
-				&& k != 0x36 && k != 0x37 && k != 0x38 && k != KEY_F2);
+		} while (k != 0x31 && k != 0x32 && k != 0x33 && k != 0x34 && k != 0x35 && k != 0x36 && k != 0x37 && k != 0x38 && k != KEY_F2);
 		switch (k) {
 		case '1':
 			TJ();
@@ -3815,7 +3708,7 @@ void TJ(void) {
 			xb = getx();
 			yb = gety();
 			moveto(xb, yb);
-			lgh = ksh(kdata, 0, 8, 1);
+			lgh = ReadLine(kdata, 0, 8, 1);
 			if (lgh == 0)
 				;
 			{
@@ -3926,7 +3819,7 @@ void MM_ManualClr(Uchar8 mode) {
 	FS_fclose(fp1);
 	libuse("parkbkp.dbf", DBFNO_PARKBKP);
 
-	memset(&dbuf[0][0], 0x00, sizeof (dbuf));//	/*字段名不同*/数据库中每条记录的大小是固定的，只需要初始化缓存一次即可。
+	memset(&dbuf[0][0], 0x00, sizeof (dbuf));				//	/*字段名不同*/数据库中每条记录的大小是固定的，只需要初始化缓存一次即可。
 	screen(0x01);
 	cls();
 	for (i = 0; i <= last; i++) {
@@ -4015,7 +3908,7 @@ void MM_DEL(Uchar8 mode) {
 	FS_fclose(fp1);
 	libuse("parkbkp.dbf", DBFNO_PARKBKP);
 
-	memset(&dbuf[0][0], 0x00, sizeof (dbuf));//	/*字段名不同*/数据库中每条记录的大小是固定的，只需要初始化缓存一次即可。
+	memset(&dbuf[0][0], 0x00, sizeof (dbuf));				//	/*字段名不同*/数据库中每条记录的大小是固定的，只需要初始化缓存一次即可。
 	screen(0x01);
 	cls();
 	for (i = 0; i <= last; i++) {
@@ -4187,7 +4080,7 @@ void MM_Set(void) {
 				putstr("  ");
 				moveto(xb, yb);
 				memset(kdata, 0x00, sizeof (kdata));
-				lgh = ksh(kdata, 0, 2, 0);
+				lgh = ReadLine(kdata, 0, 2, 0);
 				if (lgh == 0) {
 					continue;
 				} else {
@@ -4300,10 +4193,8 @@ int IN_put_CHE_PAI(uchar *s) {
 				moveto(5, 3 + input_time);
 				do {
 					ch = key(0);
-				} while (ch != KEY_CLS && ch != KEY_F1 && ch != KEY_F2
-						&& ch != 0x30 && ch != 0x31 && ch != 0x32 && ch != 0x33
-						&& ch != 0x34 && ch != 0x35 && ch != 0x36 && ch != 0x37
-						&& ch != 0x38 && ch != 0x39);
+				} while (ch != KEY_CLS && ch != KEY_F1 && ch != KEY_F2 && ch != 0x30 && ch != 0x31 && ch != 0x32 && ch != 0x33 && ch != 0x34 && ch != 0x35 && ch != 0x36 && ch != 0x37 && ch != 0x38
+						&& ch != 0x39);
 				if (ch == KEY_F1) {
 					break;
 				} else if (ch == KEY_F2) {
@@ -4597,8 +4488,7 @@ U8 display_menu(U8 startline, U8 totals, U8 itmes_total, U8 *pmenu[], uchar *kr)
 			MoveTo(1, y);
 			putstr_x(pmenu[items_ptr + current_bar], 1);			//反显
 		}
-		drawrect(0, (startline - 1) * 8, 159,
-				(startline + (itmes_total * 2) - 1) * 8 - 1);
+		drawrect(0, (startline - 1) * 8, 159, (startline + (itmes_total * 2) - 1) * 8 - 1);
 		k = key(0);
 		kr[0] = k;			//按键返回值
 		if (k == KEY_UP)		//上翻
@@ -4682,7 +4572,7 @@ void ShouFei_ChaXun(void) {
 		xb = getx();
 		yb = gety();
 		moveto(xb, yb);
-		lgh = ksh(kdata, 0, 8, 1);
+		lgh = ReadLine(kdata, 0, 8, 1);
 		if (lgh == 0)
 			;
 		{
@@ -4769,16 +4659,9 @@ void CheWei_ChaXun(void) {
 	memset((Uchar8 *) (&ParkInfo), 0x00, sizeof (ParkInfo));
 
 	Uint16 index[20];	//	查询到的记录数
-	P_U8 menu[20] = { "1                   ", "2                   ",
-			"3                   ", "4                   ",
-			"5                   ", "6                   ",
-			"7                   ", "8                   ",
-			"9                   ", "10                  ",
-			"11                  ", "12                  ",
-			"13                  ", "14                  ",
-			"15                  ", "16                  ",
-			"17                  ", "18                  ",
-			"19                  ", "20                  ", };
+	P_U8 menu[20] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
+			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
+			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", };
 
 	while (1) {
 		cb3: cls();
@@ -4786,7 +4669,7 @@ void CheWei_ChaXun(void) {
 		moveto(1, 1);
 		memset(kdata, 0x00, sizeof (kdata));
 		putstr("请输入泊位号:");
-		lgh = ksh(kdata, 0, 4, 1);
+		lgh = ReadLine(kdata, 0, 4, 1);
 		if (lgh == 0) {
 			if (kdata[1] == KEY_F2) {
 				return;
@@ -4929,7 +4812,7 @@ void BuDan(void) {
 		putstr("\n\n\n\n");
 		putstr("请输入泊位号");
 		memset(bwhdata, 0x00, sizeof (bwhdata));
-		lgh = ksh(bwhdata, 0, 4, 1);
+		lgh = ReadLine(bwhdata, 0, 4, 1);
 		if (lgh == 0) {
 			if (bwhdata[1] == KEY_F2) {
 
@@ -4973,7 +4856,7 @@ void BuDan(void) {
 			//{
 			//     goto l2;
 			//}
-			timelgh = ksh(timedata, 0, 14, 0);
+			timelgh = ReadLine(timedata, 0, 14, 0);
 			if (timelgh == 0)
 				continue;
 			if (timelgh == 14) {
@@ -5178,7 +5061,7 @@ void taodan(void) {
 		bbbb: cls();
 		memset(kdata, 0x00, sizeof (kdata));
 		putstr("请输入泊位号");
-		rt = ksh(kdata, 0, 4, 1);
+		rt = ReadLine(kdata, 0, 4, 1);
 		if (rt == 0) {
 			if (kdata[1] == KEY_F2) {
 				return;
@@ -5345,7 +5228,7 @@ Uchar8 ChaZhaoBw(TYPE_PARKINFO *ParkInfo) {
 					memset(kdata, 0x00, sizeof(kdata));
 					libset(r, LKSJ);
 					libread(kdata);
-					if ((kdata[0] < 0x30) | (kdata[0] > 0x39))//	未出门
+					if ((kdata[0] < 0x30) | (kdata[0] > 0x39))									//	未出门
 					{
 						{
 							ParkInfo->r = r;			//	break后到达此处，进门记录返回
