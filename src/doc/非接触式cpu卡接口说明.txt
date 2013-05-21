@@ -1,0 +1,49 @@
+
+
+寻卡
+char ISO14443A_findcard(unsigned char wmode,uchar *len,unsigned char *serial_nm);
+功    能：寻卡请求
+入口参数：   mode：寻卡模式
+		分为IDLE和ALL两种模式
+		0：表示为IDLE模式，一次只对一张卡操作
+  		1：表示为ALL模式，一次可对多张卡操作
+出口参数：*len，返回卡序列号长度
+         *serial_nm，卡序列号
+
+返 回：成功则返回 0
+
+
+复位
+char ISO14443A_ATS(unsigned char *len,unsigned char *rats);
+功    能： 标准ISO14443A CPU卡复位命令
+入口参数：
+出口参数： *rlen   复位字节长度
+           *ATR  复位返回的数据
+返    回：成功则返回 0
+
+
+
+
+发送命令
+char ISO14443A_APDU(unsigned char slen,unsigned char *sbuf,unsigned char *rlen, unsigned char *rbuf);
+功    能： 发送CPU卡APDU
+入口参数： slen      发送APDU长度
+           *sbuf     发送数据缓冲区
+出口参数： *rlen     返回数据长度
+           *rbuf     返回数据缓冲区
+返    回： 返回CPU卡应答响应
+           0x6fff  命令执行错误 或CPU无响应
+
+
+
+禁止卡片
+char ISO14443A_Deselect(void); 
+
+功    能：禁止卡片
+入口参数:无
+出口参数：无
+
+返 回：成功则返回 0
+
+
+

@@ -367,25 +367,32 @@ void alert(Uchar8 *message);
 
 //主函数
 int main(void) {
-	TestCpuCmd();
-	TestReadLine();
-	putstr("这中在eslipse上编译的代码on win8");
-	key(0);
-	Uchar8 k, kr, lgh, r;
+	while (1) {
+		cls();
+		putstr("cpu:1  psam:2\n");
+		uchar keyOfTest = key(0);
+		if (keyOfTest == '1') {
+			//测试用户卡
+			TestCpuCmd();
+		} else if (keyOfTest == '2') {
+			//测试PSam卡
+			putstr("输入slot:\n");
+			unsigned char slot = key(1);
+			if (slot == '1') {
+				CPUCardTEest(1);
+			} else {
+				CPUCardTEest(2);
+			}
+		} else if (keyOfTest == KEY_CLS) {
+			return 1;
+		}
+	}
+
+	Uchar8 k, kr, lgh, r, rlen;
 	Uchar8 tdata[2000];
 
 	Uchar8 ndata[40], pdata[40];
 	Uchar8 ss;
-	putstr("①请输入要测试的slot\n");
-
-	unsigned char slot = key(1);
-	if (slot == '1') {
-		CPUCardTEest(1);
-	} else {
-		CPUCardTEest(2);
-	}
-
-	unsigned short rlen;
 
 	AllUPSW_Read(&(G_USERINFO));
 	rate_set();
