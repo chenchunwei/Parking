@@ -365,8 +365,7 @@ U8 BoWei_ChaXun(U8 *bw);
 void CheWei_ChaXun1(void);
 void alert(Uchar8 *message);
 
-//主函数
-int main(void) {
+void TestCard() {
 	while (1) {
 		cls();
 		putstr("cpu:1  psam:2\n");
@@ -384,10 +383,109 @@ int main(void) {
 				CPUCardTEest(2);
 			}
 		} else if (keyOfTest == KEY_CLS) {
-			return 1;
+			return;
 		}
 	}
+}
+void TestCardServiceApi() {
+	cls();
 
+	unsigned char* cardId[20];
+	int returnValue = InitializeCpuCard(cardId);
+	if (returnValue == 0) {
+		putstr("\n卡号=");
+		putn_hex(9, cardId);
+	} else {
+		putstr("\nt互联互通失败");
+	}
+
+	returnValue = InitailizeAppOfCPU();
+	if (returnValue != 0) {
+		putstr("\n初始卡失败");
+		printf("return=%d", returnValue);
+	}
+
+	unsigned char* balance[4];
+	returnValue = ReadBalanceCommandOfCPU(balance);
+	if (returnValue != 0) {
+		putstr("\n初始卡失败");
+	} else {
+		putstr("\n余额=");
+		int balanceDec = 0;
+		int returnState = HexToInt32(balance, &balanceDec);
+		if (returnState == 0) {
+			printf("%d", balanceDec);
+		} else {
+			putstr("转换失败");
+		}
+
+	}
+
+	unsigned char* name[20];
+	returnValue = ReadUserNameCommandOfCPU(name);
+	if (returnValue != 0) {
+		putstr("\nReadUserNameCommandOfCPU失败");
+	} else {
+		putstr("\n姓名=");
+		putstr(name);
+	}
+
+	unsigned char* city[4];
+
+	returnValue = ReadCityCommandOfCPU(city);
+	if (returnValue != 0) {
+		putstr("\nReadCityCommandOfCPU失败");
+	} else {
+		putstr("\n城市=");
+		putn_hex(2, city);
+	}
+	key(0);
+	cls();
+	putstr("\u交易测试");
+	returnValue = InitailizePsamCard(1);
+	if (returnValue != 0) {
+		putstr("\nInitailizePsamCard失败");
+	}
+
+	putstr("\n交易前金额=");
+	int balanceInit = 0;
+	int returnState = ReadBalanceInt2CommandOfCPU(&balanceInit);
+	if (returnState == 0) {
+		printf("%d", balanceInit);
+	}
+	putstr("\n输入金额：");
+	uchar inputMoney[5];
+	keys(inputMoney);
+	int money = stoi(5, inputMoney);
+	putstr("\n交易中……");
+	returnValue = Payment(1, "浙D77867", money);
+	if (returnValue == 0) {
+		putstr("\n交易完成");
+
+		int balanceDec = 0;
+		int returnState = ReadBalanceInt2CommandOfCPU(&balanceDec);
+		putstr("\n余额=");
+		if (returnState == 0) {
+			printf("%d", balanceDec);
+		}
+	} else {
+		putstr("\n交易失败：Code=");
+		printf("%d", returnValue);
+		int balanceDec = 0;
+		int returnState = ReadBalanceInt2CommandOfCPU(&balanceDec);
+		putstr("\n余额=");
+		if (returnState == 0) {
+			printf("%d", balanceDec);
+		}
+	}
+	key(0);
+	key(0);
+}
+
+//主函数
+int main(void) {
+	TestCardServiceApi();
+	TestCard();
 	Uchar8 k, kr, lgh, r, rlen;
 	Uchar8 tdata[2000];
 
@@ -398,7 +496,7 @@ int main(void) {
 	rate_set();
 	ss = GET_Chip_ID(G_PosId);
 	S16toAscii(G_PosId, posiddata, 16);
-	//sprintf( posiddata, "%016d", tmpdata );
+//sprintf( posiddata, "%016d", tmpdata );
 
 	Uchar8 state = libuse("bowei.dbf", DBFNO_BOWEI);
 	Uchar8 openState = libopen(DBFNO_BOWEI);
@@ -651,7 +749,7 @@ void BWState_Ref(U8 bw[], U8 state, U8 cb_txy[]) {
 	k = sumf - 2;				//	复制的用户泊位信息
 	s = sumf - 1;				//	泊位状态
 
-	//	根据泊位号进行更新
+//	根据泊位号进行更新
 	if (sumr <= 2) {
 		ErrorMsg("无泊位信息");
 		key(0);
@@ -706,9 +804,9 @@ U8 BW_State(U8 *bw) {
 }
 void Jump_cb(Uchar8 *udata) {
 	Uchar8 r;
-	//Uchar8 rt;
+//Uchar8 rt;
 	Uchar8 tdata[20];
-	//rt = libuse( "bowei.dbf", DBFNO_BOWEI );
+//rt = libuse( "bowei.dbf", DBFNO_BOWEI );
 	libopen(DBFNO_BOWEI);
 	for (r = 0; r < libsumf(); r++) //查找所有的用户名，找出与他相匹配的
 			{
@@ -724,7 +822,7 @@ void Jump_cb(Uchar8 *udata) {
 			memcpy(PUBLIC_VALUE, tdata, 6);
 		}
 	}
-	//return *tdata;
+//return *tdata;
 			}
 U8 BoWei_XuanZe(U8 *bw) {
 	U8 kr, lgh;
@@ -735,11 +833,12 @@ U8 BoWei_XuanZe(U8 *bw) {
 	U8 k, s;
 	U8 mtotal;
 
-	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
-			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
-			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", "21                  ",
-			"22                  ", "23                  ", "24                  ", "25                  ", "26                  ", "27                  ", "28                  ",
-			"29                  ", "30                  ", };
+	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ",
+			"6                   ", "7                   ", "8                   ", "9                   ", "10                  ",
+			"11                  ", "12                  ", "13                  ", "14                  ", "15                  ",
+			"16                  ", "17                  ", "18                  ", "19                  ", "20                  ",
+			"21                  ", "22                  ", "23                  ", "24                  ", "25                  ",
+			"26                  ", "27                  ", "28                  ", "29                  ", "30                  ", };
 	mtotal = (sizeof (menu)) / sizeof(menu[0]);
 	cls();
 	//moveto( 1, 1 );
@@ -842,11 +941,12 @@ U8 BoWei_ChaXun(U8 *bw) {
 	memset((Uchar8 *) (&ParkInfo), 0x00, sizeof (ParkInfo));
 	Uint16 index[20];   //  查询到的记录数
 	U8 mtotal;
-	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
-			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
-			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", "21                  ",
-			"22                  ", "23                  ", "24                  ", "25                  ", "26                  ", "27                  ", "28                  ",
-			"29                  ", "30                  ", };
+	P_U8 menu[30] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ",
+			"6                   ", "7                   ", "8                   ", "9                   ", "10                  ",
+			"11                  ", "12                  ", "13                  ", "14                  ", "15                  ",
+			"16                  ", "17                  ", "18                  ", "19                  ", "20                  ",
+			"21                  ", "22                  ", "23                  ", "24                  ", "25                  ",
+			"26                  ", "27                  ", "28                  ", "29                  ", "30                  ", };
 	mtotal = (sizeof (menu)) / sizeof(menu[0]);
 
 	libopen(DBFNO_PARK);
@@ -1613,7 +1713,7 @@ Uchar8 JMPD_DB(TYPE_PARKINFO *ParkInfo) {
 		memset(kdata, 0x00, sizeof (kdata));
 		libset(r, CHEPAI);
 		libread(kdata);
-		if (memcmp(ParkInfo->chepai, kdata, strlen(ParkInfo->chepai)) == 0)									//	数据库读取后会有填充的空格，如果欲取kdata长度必须用length
+		if (memcmp(ParkInfo->chepai, kdata, strlen(ParkInfo->chepai)) == 0)								//	数据库读取后会有填充的空格，如果欲取kdata长度必须用length
 				{
 					memset(kdata, 0x00, sizeof(kdata));
 					libset(r, LKSJ);
@@ -2106,8 +2206,8 @@ void Get_DateTime(Uchar8 c, Uchar8 *tdata) {
 	cdata[10] = ' ';
 	gettime(&(cdata[11]));
 	Change_DateTime_Style(0, cdata);
-	if (c == 1)									//	系统时间的间隔为"-"，需要替代为":"。
-			{
+	if (c == 1) {
+		//	系统时间的间隔为"-"，需要替代为":"。
 		Change_DateTime_Style(1, cdata);
 		memcpy(tdata, cdata, 19);		//	如果确定目标指针内存有足够空间，则添加结束符0x00，否则不添加。
 	} else {
@@ -2539,8 +2639,8 @@ void TimeSpan_Calc(TYPE_TIMESPAN *ts) {
 
 #if( 1 )
 	{
-		if ((((ts->begin[4]) < 0x30) | ((ts->begin[4]) > 0x39)) | (((ts->begin[7]) < 0x30) | ((ts->begin[7]) > 0x39)) | (((ts->end[4]) < 0x30) | ((ts->end[4]) > 0x39))
-				| (((ts->end[7]) < 0x30) | ((ts->end[7]) > 0x39))) {
+		if ((((ts->begin[4]) < 0x30) | ((ts->begin[4]) > 0x39)) | (((ts->begin[7]) < 0x30) | ((ts->begin[7]) > 0x39))
+				| (((ts->end[4]) < 0x30) | ((ts->end[4]) > 0x39)) | (((ts->end[7]) < 0x30) | ((ts->end[7]) > 0x39))) {
 			//ErrorMsg( "TIMESPAN入口参数格式错误" );
 			//key(0);
 			return;
@@ -4200,8 +4300,8 @@ int IN_put_CHE_PAI(uchar *s) {
 				moveto(5, 3 + input_time);
 				do {
 					ch = key(0);
-				} while (ch != KEY_CLS && ch != KEY_F1 && ch != KEY_F2 && ch != 0x30 && ch != 0x31 && ch != 0x32 && ch != 0x33 && ch != 0x34 && ch != 0x35 && ch != 0x36 && ch != 0x37 && ch != 0x38
-						&& ch != 0x39);
+				} while (ch != KEY_CLS && ch != KEY_F1 && ch != KEY_F2 && ch != 0x30 && ch != 0x31 && ch != 0x32 && ch != 0x33 && ch != 0x34
+						&& ch != 0x35 && ch != 0x36 && ch != 0x37 && ch != 0x38 && ch != 0x39);
 				if (ch == KEY_F1) {
 					break;
 				} else if (ch == KEY_F2) {
@@ -4666,9 +4766,10 @@ void CheWei_ChaXun(void) {
 	memset((Uchar8 *) (&ParkInfo), 0x00, sizeof (ParkInfo));
 
 	Uint16 index[20];	//	查询到的记录数
-	P_U8 menu[20] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ", "6                   ", "7                   ",
-			"8                   ", "9                   ", "10                  ", "11                  ", "12                  ", "13                  ", "14                  ",
-			"15                  ", "16                  ", "17                  ", "18                  ", "19                  ", "20                  ", };
+	P_U8 menu[20] = { "1                   ", "2                   ", "3                   ", "4                   ", "5                   ",
+			"6                   ", "7                   ", "8                   ", "9                   ", "10                  ",
+			"11                  ", "12                  ", "13                  ", "14                  ", "15                  ",
+			"16                  ", "17                  ", "18                  ", "19                  ", "20                  ", };
 
 	while (1) {
 		cb3: cls();

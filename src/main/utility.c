@@ -1,12 +1,12 @@
 #include<hspos.h>
-
+#define SUCCESS	0
 /*将字符串转换成16进制数*/
-void CharToHex(char *returnData, char * buffer, int len) {
+void CharToHex(char *returnData, char * inputBuffer, int len) {
 	int i = 0;
 	int j = 0;
 	unsigned char temp;
 	while (i < len) {
-		temp = buffer[i];
+		temp = inputBuffer[i];
 		if ((temp >= 0x30) && (temp <= 0x39)) {
 			temp = temp - 0x30;
 			returnData[j] = temp << 4;
@@ -19,7 +19,7 @@ void CharToHex(char *returnData, char * buffer, int len) {
 		} else {
 			returnData[j] = 0x00;
 		}
-		temp = buffer[i + 1];
+		temp = inputBuffer[i + 1];
 		if ((temp >= 0x30) && (temp <= 0x39)) {
 			temp = temp - 0x30;
 			returnData[j] = returnData[j] | temp;
@@ -113,17 +113,20 @@ int ReadLine(uchar *cData, uchar renderLen, uchar maxLen, uchar charType) {
 	} while (1);
 	return currentCursor;
 }
-//test readLine
-void TestReadLine() {
-	while (1) {
-		uchar cmd = key(0);
-		if (cmd == KEY_CLS) {
-			return;
-		}
-		char input[100];
-		int len = ReadLine(input, 0, 100, 1);
 
-		printf("%s,len=%d", input, len);
-	}
+//HEX => Int32 [Exam: 0x00,0x00,0x03,0xE8 => 1000]
+int HexToInt32(uchar * hex, int *dec) {
+	int index = 0;
+	*dec = (hex[index] << 24) | (hex[index + 1] << 16) | (hex[index + 2] << 8) | hex[index + 3];
+	return SUCCESS;
+}
+
+//Int32 => HEX [Exam: 1000 => 0x00,0x00,0x03,0xE8]
+int Int32ToHex(int dec, uchar *hexBuffer) {
+	hexBuffer[0] = dec >> 24;
+	hexBuffer[1] = dec >> 16;
+	hexBuffer[2] = dec >> 8;
+	hexBuffer[3] = dec & 0xFF;
+	return SUCCESS;
 }
 

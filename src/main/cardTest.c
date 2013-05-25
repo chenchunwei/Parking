@@ -1,4 +1,17 @@
 #include <hspos.h>
+//test readLine
+void TestReadLine() {
+	while (1) {
+		uchar cmd = key(0);
+		if (cmd == KEY_CLS) {
+			return;
+		}
+		char input[100];
+		int len = ReadLine(input, 0, 100, 1);
+
+		printf("%s,len=%d", input, len);
+	}
+}
 
 void CPUCardTEest(int slot, char* cmd) {
 	unsigned char k, i, returnLen,returnValue;
